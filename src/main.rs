@@ -35,22 +35,9 @@ async fn main() {
     let mut color = COLORS[0]; //RED
     let mut total_circles = 1;
     let mut circle_last_time = time::get_time();
-
+    let mut new_circle = false;
     loop {
         clear_background(GRAY);
-
-        let time_now = time::get_time();
-        if time_now - circle_last_time > 1. {
-            // after 1 sec draw another circle
-            x = rand::gen_range(10., screen_width() - 10.);
-            y = rand::gen_range(10., screen_height() - 10.);
-            r = rand::gen_range(10., screen_width() / 10.);
-            circle.x = x;
-            circle.y = y;
-            circle.r = r;
-            total_circles += 1;
-            circle_last_time = time_now;
-        }
 
         if is_mouse_button_pressed(MouseButton::Left) {
             let (mouse_x, mouse_y) = mouse_position();
@@ -60,8 +47,24 @@ async fn main() {
                 score += 1;
                 play_sound_once(beep_sound);
                 color = COLORS[rand::gen_range(0, 9)];
+                new_circle = true;
             }
         }
+
+        let time_now = time::get_time();
+        if new_circle || time_now - circle_last_time > 1. {
+            // after 1 sec draw another circle
+            x = rand::gen_range(10., screen_width() - 10.);
+            y = rand::gen_range(10., screen_height() - 10.);
+            r = rand::gen_range(10., screen_width() / 10.);
+            circle.x = x;
+            circle.y = y;
+            circle.r = r;
+            total_circles += 1;
+            circle_last_time = time_now;
+            new_circle = false;
+        }
+
 
         draw_text(
             "Click me! game",
